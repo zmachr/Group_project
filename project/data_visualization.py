@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from pyecharts import options as opts
 from pyecharts.charts import Bar, Page, Pie, Polar
-from pyecharts.faker import Faker
+# from pyecharts.faker import Faker
 import os
 from pyecharts.globals import ThemeType
 
@@ -60,11 +60,11 @@ def get_results(current_file_path1):
     return bar_data1, pie_data1,  # unique_values_score1, score_data1
 
 
-def visualization(result1, counts1, ):  # unique_values_score1, score_data1):
+def visualization(result1, counts1, result2, counts2):  # unique_values_score1, score_data1):
     # 生成数据
     x_data = ['平均分数', '平均采蜜量', '平均存活只数', '游戏平均剩余时间', '最高得分', '最高采蜜量']
     y_data_a = result1
-    y_data_b = Faker.values()
+    y_data_b = result2
 
     def bar_data() -> Bar:
         c = (
@@ -87,19 +87,19 @@ def visualization(result1, counts1, ):  # unique_values_score1, score_data1):
 
             .add(
                 "",
-                [list(z) for z in zip(("存活0只", "1", "2", "3"), counts1)],
+                [list(z) for z in zip(("0", "1", "2", "3"), counts1)],
                 radius=["30%", "70%"],
                 center=["30%", "50%"],
                 label_opts=opts.LabelOpts(is_show=True),
             )
 
-            # .add(
-            #     "",
-            #     [list(z) for z in zip(v, Faker.values())],
-            #     radius=["30%", "75%"],
-            #     center=["75%", "50%"],
-            #     label_opts=opts.LabelOpts(is_show=True)
-            # )
+            .add(
+                "",
+                [list(z) for z in zip(("0", "1", "2", "3"), counts2)],
+                radius=["30%", "75%"],
+                center=["75%", "50%"],
+                label_opts=opts.LabelOpts(is_show=True)
+            )
             .set_global_opts(
                 title_opts=opts.TitleOpts(title="蜜蜂存活只数"),
                 legend_opts=opts.LegendOpts(orient="vertical")
