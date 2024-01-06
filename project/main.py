@@ -40,8 +40,8 @@ def CrossMatch(n, BF, HoneyBee, Hornet, round):
         print(i)
         # 使用os.system调用Java编译器来编译Java文件
         os.chdir(BF)  # 进入java文件夹，根据实际情况修改
-        os.system("javac HoneyBee.java")  # 编译
-        os.system("javac Hornet.java")  # 编译
+        os.system("javac *.java")  # 编译
+        # os.system("javac Hornet.java")  # 编译
         # 使用os.system调用Java运行时环境来运行Java程序
         os.system("java game")
 
@@ -55,20 +55,21 @@ if __name__ == '__main__':
     # 小组1,2
     group1 = '214'
     group2 = '001'
+    n = 1
     # BF,Group目录路径
     BFSource = [os.path.dirname(__file__) + "/../BF1", os.path.dirname(__file__) + "/../BF2"]
     GroupSource = os.path.dirname(__file__) + "/../group"  # group路径
     # 黄蜂，蜜蜂路径
     GHoneyBee = [GroupSource + "/【{}】/HoneyBee.java".format(group1), GroupSource + "/【{}】/HoneyBee.java".format(group2)]
-    GHornet = [GroupSource + "/【{}】/HoneyBee.java".format(group2), GroupSource + "/【{}】/Hornet.java".format(group1)]
-    current_file_path = []
+    GHornet = [GroupSource + "/【{}】/Hornet.java".format(group2), GroupSource + "/【{}】/Hornet.java".format(group1)]
+    # current_file_path = []
 
     T_multi_begin = time.time()
     # pool并发运行交叉对战
     print('Parent process %s.' % os.getpid())
     p = Pool(2)
     for round in range(2):
-        p.apply_async(CrossMatch, args=(1, BFSource[round], GHoneyBee[round], GHornet[round], round + 1))
+        p.apply_async(CrossMatch, args=(n, BFSource[round], GHoneyBee[round], GHornet[round], round + 1))
 
     print('Waiting for all subprocesses done...')
     p.close()
@@ -78,8 +79,8 @@ if __name__ == '__main__':
     # 串行测试，对照组,如果测串行，最终结果是串行结果
     if test_multi:
         T_single_begin = time.time()
-        CrossMatch(1, BFSource[0], GHoneyBee[0], GHornet[0], 1)
-        CrossMatch(1, BFSource[1], GHoneyBee[1], GHornet[1], 2)
+        CrossMatch(n, BFSource[0], GHoneyBee[0], GHornet[0], 1)
+        CrossMatch(n, BFSource[1], GHoneyBee[1], GHornet[1], 2)
         print('串行时间(不含数据处理):%.5fs' % (time.time() - T_single_begin))
     print('并行时间(不含数据处理):%.5fs' % (T_multi_end - T_multi_begin))
 
