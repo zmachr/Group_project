@@ -5,6 +5,10 @@ from pyecharts.charts import Bar, Page, Pie, Polar
 # from pyecharts.faker import Faker
 import os
 from pyecharts.globals import ThemeType
+# 导入输出图片工具
+from pyecharts.render import make_snapshot
+# 使用snapshot-selenium 渲染图片
+from snapshot_selenium import snapshot
 
 
 def get_results(current_file_path1):
@@ -60,49 +64,76 @@ def get_results(current_file_path1):
     return bar_data1, pie_data1,  # unique_values_score1, score_data1
 
 
-def visualization(result1, counts1, result2, counts2):  # unique_values_score1, score_data1):
+def visualization(result1, counts1, result2, counts2, group1, group2):  # unique_values_score1, score_data1):
     # 生成数据
-    x_data = ['平均分数', '平均采蜜量', '平均存活只数', '游戏平均剩余时间', '最高得分', '最高采蜜量']
-    y_data_a = result1
-    y_data_b = result2
+    # x_data = ['平均分数', '平均采蜜量', '平均存活只数', '游戏平均剩余时间', '最高得分', '最高采蜜量']
+    x_data = ['平均分数', '平均采蜜量', '最高得分', '最高采蜜量']
+    new_result1 = result1[0:2] + result1[4:]
+    new_result2 = result2[0:2] + result2[4:]
+    y_data_a = new_result1
+    y_data_b = new_result2
+
+    x_data_small = ['平均存活只数', '游戏平均剩余时间']
+    y_data_a_small = result1[2:4]
+    y_data_b_small = result2[2:4]
 
     def bar_data() -> Bar:
         c = (
 
-            Bar(init_opts=opts.InitOpts(theme=ThemeType.MACARONS))
+            Bar(init_opts=opts.InitOpts(theme=ThemeType.MACARONS, width="800px", height="500px", ))
             .add_xaxis(x_data)
-            .add_yaxis("用户1", y_data_a)
-            .add_yaxis("用户2", y_data_b)
+            # .add_yaxis("用户1", result1)
+            # .add_yaxis("用户2", result2)
+            .add_yaxis(group1, y_data_a)
+            .add_yaxis(group2, y_data_b)
             .set_global_opts(
-                xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(font_family="黑体", font_size=10)),
+                xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(font_family="黑体", font_size=12)),
                 title_opts=opts.TitleOpts(title="最终结果", subtitle=" "),
+                brush_opts=opts.BrushOpts(),
+                # datazoom_opts=opts.DataZoomOpts(orient="vertical"),  # DataZoomOpts：区域缩放配置项， 布局方式是横还是竖
             )
         )
         return c
 
-    # 2.饼图
+    def bar_data_small() -> Bar:
+        c = (
+
+            Bar(init_opts=opts.InitOpts(theme=ThemeType.MACARONS, width="800px", height="500px", ))
+            .add_xaxis(x_data_small)
+            .add_yaxis(group1, y_data_a_small)
+            .add_yaxis(group2, y_data_b_small)
+            .set_global_opts(
+                xaxis_opts=opts.AxisOpts(axislabel_opts=opts.LabelOpts(font_family="黑体", font_size=12)),
+                title_opts=opts.TitleOpts(title="最终结果", subtitle=" "),
+                brush_opts=opts.BrushOpts(),
+                # datazoom_opts=opts.DataZoomOpts(orient="vertical"),
+            )
+        )
+        return c
+
     def pie_type() -> Pie:
         c = (
-            Pie(init_opts=opts.InitOpts(theme=ThemeType.MACARONS))
+            Pie(init_opts=opts.InitOpts(theme=ThemeType.MACARONS, width="1000px", height="500px", ))
 
             .add(
-                "",
+                group1,
                 [list(z) for z in zip(("0", "1", "2", "3"), counts1)],
                 radius=["30%", "70%"],
-                center=["30%", "50%"],
+                center=["27%", "50%"],
                 label_opts=opts.LabelOpts(is_show=True),
             )
 
             .add(
-                "",
+                group2,
                 [list(z) for z in zip(("0", "1", "2", "3"), counts2)],
-                radius=["30%", "75%"],
-                center=["75%", "50%"],
+                radius=["30%", "70%"],
+                center=["72%", "50%"],
                 label_opts=opts.LabelOpts(is_show=True)
             )
             .set_global_opts(
-                title_opts=opts.TitleOpts(title="蜜蜂存活只数"),
-                legend_opts=opts.LegendOpts(orient="vertical")
+                title_opts=opts.TitleOpts(title="蜜蜂存活只数", subtitle=" " * 70 + group1 + " " * 122 + group2),
+                legend_opts=opts.LegendOpts(orient="vertical"),
+                brush_opts=opts.BrushOpts(),
             )
             .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
         )
@@ -121,14 +152,18 @@ def visualization(result1, counts1, result2, counts2):  # unique_values_score1, 
     #     return c
 
     def page_simple_layout():
-        #    page = Page()   默认布局
-        page = Page(layout=Page.DraggablePageLayout)  # 可改动位置
-        # page = Page(layout=Page.SimplePageLayout)  # 简单布局
+        # page = Page()   #默认布局
+        # page = Page(layout=Page.DraggablePageLayout)  # 可改动位置
+        page = Page(layout=Page.SimplePageLayout)  # 简单布局
         # 将上面定义好的图添加到 page
-        page.add(bar_data(), pie_type(), )
+        page.add(bar_data(), bar_data_small(), pie_type(), )
         page.render("page_simple_layout.html")
 
+    make_snapshot(snapshot, bar_data().render(), "bar.png", )
+    make_snapshot(snapshot, bar_data_small().render(), "bar_small.png", )
+    make_snapshot(snapshot, pie_type().render(), "pie.png", )
     page_simple_layout()
+
     cmd_str = "page_simple_layout.html"
     f = os.popen(cmd_str)
     f.close()
