@@ -135,7 +135,7 @@ def visualization(result1, counts1, result2, counts2, group1, group2):  # unique
                 legend_opts=opts.LegendOpts(orient="vertical"),
                 brush_opts=opts.BrushOpts(),
             )
-            .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
+            .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {d}%"))
         )
         return c
 
