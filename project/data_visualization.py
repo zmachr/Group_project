@@ -139,31 +139,28 @@ def visualization(result1, counts1, result2, counts2, group1, group2):  # unique
         )
         return c
 
-    # def polar_data() -> Polar:
-    #     # for i in score_data1:
-    #
-    #     data = unique_values_score1
-    #     data = [(unique_values_score1, score_data1) for score_data1 in range(600)]
-    #     c = (
-    #         Polar(init_opts=opts.InitOpts(theme=ThemeType.MACARONS))
-    #         .add("", data, type_="scatter", label_opts=opts.LabelOpts(is_show=False))
-    #         .set_global_opts(title_opts=opts.TitleOpts(title="Polar-Scatter0"))
-    #     )
-    #     return c
-
     def page_simple_layout():
-        # page = Page()   #默认布局
-        # page = Page(layout=Page.DraggablePageLayout)  # 可改动位置
         page = Page(layout=Page.SimplePageLayout)  # 简单布局
-        # 将上面定义好的图添加到 page
         page.add(bar_data(), bar_data_small(), pie_type(), )
         page.render("page_simple_layout.html")
 
-    make_snapshot(snapshot, bar_data().render(), "bar.png", )
-    make_snapshot(snapshot, bar_data_small().render(), "bar_small.png", )
-    make_snapshot(snapshot, pie_type().render(), "pie.png", )
+         # 打开HTML文件
+        with open('page_simple_layout.html', 'r') as file:
+            # 读取文件内容
+            content = file.readlines()
+
+        # 在第二行插入新的<body>标签
+        content.insert(1, '<body style="background-color: rgb(190,246,128);">\n')
+
+        # 将修改后的HTML内容写回文件
+        with open('page_simple_layout.html', 'w') as file:
+            file.writelines(content)
+
+    # make_snapshot(snapshot, bar_data().render(), "bar.png", )
+    # make_snapshot(snapshot, bar_data_small().render(), "bar_small.png", )
+    # make_snapshot(snapshot, pie_type().render(), "pie.png", )
     page_simple_layout()
 
-    cmd_str = "page_simple_layout.html"
-    f = os.popen(cmd_str)
-    f.close()
+    # cmd_str = "page_simple_layout.html"
+    # f = os.popen(cmd_str)
+    # f.close()
